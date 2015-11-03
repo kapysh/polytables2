@@ -1,0 +1,11 @@
+.pt2-clickable {
+  cursor: pointer !important;
+}
+
+.pt2-clickable:hover {
+  background-color: red;
+}
+
+.pt2-section {
+  display: none;
+}
