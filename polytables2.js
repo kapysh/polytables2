@@ -21,7 +21,7 @@
       this.config.collapsible = {
         columns: obj.collapsible.columns.sort(function(a, b){return a-b})
       };
-      this.cols = this.config.collapsable.columns;
+      this.cols = this.config.collapsible.columns;
       this.final_col = this.cols[this.cols.length-1]+1;
     }
   }
@@ -103,7 +103,7 @@
             });
             row_count++;
             // if we're at the last cell - add listeners
-            if((row_count == rows.length) && col_count == thisClass.final_col) {
+            if((row_count == rows.length) && (col_count == thisClass.final_col)) {
               for(var k = 0; k < ctrl_count; k++) {
                 $('.pt2-section-ctrl-'+k).click(thisClass.expandSection(k));
               }
