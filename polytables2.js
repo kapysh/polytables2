@@ -34,90 +34,92 @@
         var grid = [];
         var col_count = 0;
         var ctrl_count = 0;
+        grid[0] = [];
         var rows = thisClass.target.find('tbody tr');
         // for all columns we care about
         for(var i = thisClass.cols[0]; i <= thisClass.final_col; i++) {
-          // caching grid for updates
-          if(!grid[col_count]) {
-            grid[col_count] = [];
-          }
           // create this for caching purposes
           grid[col_count+1] = [];
           var row_count = 0;
           rows.each(function() {
             var row = $(this);
-            row.find('td:eq('+col_count+')').each(function() {
-              var cell = $(this);
-              var current_grid_cell = grid[col_count][row_count];
-              // caching grid for updates
-              if(!grid[col_count+1][row_count]) {
-                grid[col_count+1][row_count] = null;
-              }
+            var cell = row.find('td:eq('+col_count+')').first();
+            var current_grid_cell = grid[col_count][row_count];
 
-              // this happens if the current cell is not a section
-              if(!current_grid_cell) {
-                grid[col_count][row_count] = current_grid_cell = {
-                  expandable_by_column: null,
-                  expandable_by_ctrl: null,
-                  collapsible_by_columns: [],
-                  collapsible_by_ctrls: []
-                };
-              }
-              // here it is a section - or a continuation
-              else {
-                if (cell.html()) {
-                  row.addClass(buildNewClass(current_grid_cell))
-                }
-                // we just need to continue so the right row gets the classes
-                if(row_count < rows.length-1 && !grid[col_count-1][row_count+1].is_controller) {
-                  var new_grid_cell = {
-                    expandable_by_column: current_grid_cell.expandable_by_column,
-                    expandable_by_ctrl: current_grid_cell.expandable_by_ctrl,
-                    collapsible_by_columns: current_grid_cell.collapsible_by_columns,
-                    collapsible_by_ctrls: current_grid_cell.collapsible_by_ctrls
-                  };
-                  grid[col_count][row_count+1] = new_grid_cell;
-                }
-              }
-              // if cell is not empty
+            // caching grid for updates
+            if(!grid[col_count+1][row_count]) {
+              grid[col_count+1][row_count] = null;
+            }
+
+            // this happens if the current cell is not a section
+            if(!current_grid_cell) {
+              grid[col_count][row_count] = current_grid_cell = {
+                expandable_by_column: null,
+                expandable_by_ctrl: null,
+                collapsible_by_columns: [],
+                collapsible_by_ctrls: []
+              };
+            }
+            // here it is a section - or a continuation
+            else {
               if (cell.html()) {
-                // if cell is in an expandable column
-                if (thisClass.cols.indexOf(col_count) >= 0) {
-                  grid[col_count][row_count].is_controller = true;
-                  // add the section ctrl with col class
-                  cell.addClass('pt2-clickable pt2-section-ctrl-'+ctrl_count);
-                  var cloned_collapsible_by_columns = current_grid_cell.collapsible_by_columns.slice(0);
-                  cloned_collapsible_by_columns.push(col_count);
-                  var cloned_collapsible_by_ctrls = current_grid_cell.collapsible_by_ctrls.slice(0);
-                  cloned_collapsible_by_ctrls.push(ctrl_count);
+                row.addClass(buildNewClass(current_grid_cell))
+              }
+              // we just need to continue so the right row gets the classes
+              if(row_count < rows.length-1 && !grid[col_count-1][row_count+1].is_controller) {
+                var new_grid_cell = {
+                  expandable_by_column: current_grid_cell.expandable_by_column,
+                  expandable_by_ctrl: current_grid_cell.expandable_by_ctrl,
+                  collapsible_by_columns: current_grid_cell.collapsible_by_columns,
+                  collapsible_by_ctrls: current_grid_cell.collapsible_by_ctrls
+                };
+                grid[col_count][row_count+1] = new_grid_cell;
+              }
+            }
+            // if cell is not empty
+            if (cell.html()) {
+              // if cell is in an expandable column
+              if (thisClass.cols.indexOf(col_count) >= 0) {
+                grid[col_count][row_count].is_controller = true;
+                // add the section ctrl with col class
+                cell.addClass('pt2-clickable pt2-section-ctrl-'+ctrl_count);
+                var cloned_collapsible_by_columns = current_grid_cell.collapsible_by_columns.slice(0);
+                cloned_collapsible_by_columns.push(col_count);
+                var cloned_collapsible_by_ctrls = current_grid_cell.collapsible_by_ctrls.slice(0);
+                cloned_collapsible_by_ctrls.push(ctrl_count);
 
-                  grid[col_count+1][row_count+1] = {
-                    expandable_by_column: col_count,
-                    expandable_by_ctrl: ctrl_count,
-                    collapsible_by_columns: cloned_collapsible_by_columns,
-                    collapsible_by_ctrls: cloned_collapsible_by_ctrls
-                  };
-                  ctrl_count++;
-                }
+                grid[col_count+1][row_count+1] = {
+                  expandable_by_column: col_count,
+                  expandable_by_ctrl: ctrl_count,
+                  collapsible_by_columns: cloned_collapsible_by_columns,
+                  collapsible_by_ctrls: cloned_collapsible_by_ctrls
+                };
+                ctrl_count++;
               }
-            });
+            }
             row_count++;
-            // if we're at the last cell - add listeners
+            // if we're at the last cell - finalize table
             if((row_count == rows.length) && (col_count == thisClass.final_col)) {
-              for(var k = 0; k < ctrl_count; k++) {
-                $('.pt2-section-ctrl-'+k).click(thisClass.expandSection(k));
-              }
-              for(var k = 0; k < thisClass.cols.length; k++) {
-                var col = thisClass.cols[k];
-                thisClass.target.find('th:eq('+col+')').each(function() {
-                  var el = $(this);
-                  el.prepend('<span class="pt2-th-'+col+'">+&nbsp;</span>').addClass('pt2-clickable').click(thisClass.expandColumn(col));
-                });
-              }
+              thisClass.finalizeTable(ctrl_count);
             }
           });
           col_count++;
         }
+      }
+    },
+
+    // add click listeners and header identifiers
+    finalizeTable: function(ctrl_count) {
+      var thisClass = this;
+      for(var k = 0; k < ctrl_count; k++) {
+        $('.pt2-section-ctrl-'+k).click(thisClass.expandSection(k));
+      }
+      for(var k = 0; k < thisClass.cols.length; k++) {
+        var col = thisClass.cols[k];
+        thisClass.target.find('th:eq('+col+')').each(function() {
+          var el = $(this);
+          el.prepend('<span class="pt2-th-'+col+'">+&nbsp;</span>').addClass('pt2-clickable').click(thisClass.expandColumn(col));
+        });
       }
     },
 
