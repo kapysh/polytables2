@@ -46,7 +46,7 @@
             var cell = row.find('td:eq('+col_count+')').first();
             var current_grid_cell = grid[col_count][row_count];
 
-            // this happens if the current cell is not a section
+            // cache grid cell
             if(!current_grid_cell) {
               grid[col_count][row_count] = current_grid_cell = {
                 expandable_by_column: null,
@@ -55,7 +55,7 @@
                 collapsible_by_ctrls: []
               };
             }
-            // here it is a section - or a continuation
+            // if current grid cell exists, it's a continuation
             else {
               if (cell.html()) {
                 row.addClass(buildRowClass(current_grid_cell))
