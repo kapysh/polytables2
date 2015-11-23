@@ -4,11 +4,11 @@
   var buildNewClass = function buildNewClass(current_grid_cell) {
     var newClass = 'pt2-section pt2-expandable-by-col-'+current_grid_cell.expandable_by_column+
       ' pt2-expandable-by-ctrl-'+current_grid_cell.expandable_by_ctrl;
-    for(var i = 0; i < current_grid_cell.collapsable_by_columns.length; i++) {
-      newClass += ' pt2-collapsable-by-col-'+current_grid_cell.collapsable_by_columns[i];
+    for(var i = 0; i < current_grid_cell.collapsible_by_columns.length; i++) {
+      newClass += ' pt2-collapsible-by-col-'+current_grid_cell.collapsible_by_columns[i];
     }
-    for(var i = 0; i < current_grid_cell.collapsable_by_ctrls.length; i++) {
-      newClass += ' pt2-collapsable-by-ctrl-'+current_grid_cell.collapsable_by_ctrls[i];
+    for(var i = 0; i < current_grid_cell.collapsible_by_ctrls.length; i++) {
+      newClass += ' pt2-collapsible-by-ctrl-'+current_grid_cell.collapsible_by_ctrls[i];
     }
 
     return newClass;
@@ -17,21 +17,21 @@
   function polytables2(obj) {
     this.target = obj.target;
     this.config = {};
-    if (obj.collapsable) {
-      this.config.collapsable = {
-        columns: obj.collapsable.columns.sort(function(a, b){return a-b})
+    if (obj.collapsible) {
+      this.config.collapsible = {
+        columns: obj.collapsible.columns.sort(function(a, b){return a-b})
       };
     }
 
-    this.cols = this.config.collapsable.columns;
+    this.cols = this.config.collapsible.columns;
     this.final_col = this.cols[this.cols.length-1]+1;
   }
 
   polytables2.prototype = {
     initTable: function() {
       var thisClass = this;
-      // set up collapsable
-      if(thisClass.config.collapsable) {
+      // set up collapsible
+      if(thisClass.config.collapsible) {
         var grid = [];
         var col_count = 0;
         var ctrl_count = 0;
@@ -60,8 +60,8 @@
                 grid[col_count][row_count] = current_grid_cell = {
                   expandable_by_column: null,
                   expandable_by_ctrl: null,
-                  collapsable_by_columns: [],
-                  collapsable_by_ctrls: []
+                  collapsible_by_columns: [],
+                  collapsible_by_ctrls: []
                 };
               }
               // here it is a section - or a continuation
@@ -74,8 +74,8 @@
                   var new_grid_cell = {
                     expandable_by_column: current_grid_cell.expandable_by_column,
                     expandable_by_ctrl: current_grid_cell.expandable_by_ctrl,
-                    collapsable_by_columns: current_grid_cell.collapsable_by_columns,
-                    collapsable_by_ctrls: current_grid_cell.collapsable_by_ctrls
+                    collapsible_by_columns: current_grid_cell.collapsible_by_columns,
+                    collapsible_by_ctrls: current_grid_cell.collapsible_by_ctrls
                   };
                   grid[col_count][row_count+1] = new_grid_cell;
                 }
@@ -87,16 +87,16 @@
                   grid[col_count][row_count].is_controller = true;
                   // add the section ctrl with col class
                   cell.addClass('pt2-clickable pt2-section-ctrl-'+ctrl_count);
-                  var cloned_collapsable_by_columns = current_grid_cell.collapsable_by_columns.slice(0);
-                  cloned_collapsable_by_columns.push(col_count);
-                  var cloned_collapsable_by_ctrls = current_grid_cell.collapsable_by_ctrls.slice(0);
-                  cloned_collapsable_by_ctrls.push(ctrl_count);
+                  var cloned_collapsible_by_columns = current_grid_cell.collapsible_by_columns.slice(0);
+                  cloned_collapsible_by_columns.push(col_count);
+                  var cloned_collapsible_by_ctrls = current_grid_cell.collapsible_by_ctrls.slice(0);
+                  cloned_collapsible_by_ctrls.push(ctrl_count);
 
                   grid[col_count+1][row_count+1] = {
                     expandable_by_column: col_count,
                     expandable_by_ctrl: ctrl_count,
-                    collapsable_by_columns: cloned_collapsable_by_columns,
-                    collapsable_by_ctrls: cloned_collapsable_by_ctrls
+                    collapsible_by_columns: cloned_collapsible_by_columns,
+                    collapsible_by_ctrls: cloned_collapsible_by_ctrls
                   };
                   ctrl_count++;
                 }
@@ -131,7 +131,7 @@
           for(var i = index; i < thisClass.cols.length; i++) {
             $('.pt2-th-'+thisClass.cols[i]).html('+&nbsp;');
           }
-          $('.pt2-collapsable-by-col-'+col).hide();
+          $('.pt2-collapsible-by-col-'+col).hide();
         }
         else {
           $('.pt2-th-'+col).html('-&nbsp;');
@@ -144,7 +144,7 @@
       return function() {
         var expandable = $('.pt2-expandable-by-ctrl-'+ctrl);
         if(expandable.first().is(":visible")) {
-          $('.pt2-collapsable-by-ctrl-'+ctrl).hide();
+          $('.pt2-collapsible-by-ctrl-'+ctrl).hide();
         }
         else {
           expandable.show();
@@ -158,7 +158,7 @@
     var self = this;
     var settings = $.extend(true, {
       target: self,
-      collapsable: {
+      collapsible: {
         columns: [0]
       }
     }, config);
