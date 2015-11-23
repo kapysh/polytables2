@@ -21,10 +21,9 @@
       this.config.collapsible = {
         columns: obj.collapsible.columns.sort(function(a, b){return a-b})
       };
+      this.cols = this.config.collapsable.columns;
+      this.final_col = this.cols[this.cols.length-1]+1;
     }
-
-    this.cols = this.config.collapsible.columns;
-    this.final_col = this.cols[this.cols.length-1]+1;
   }
 
   polytables2.prototype = {
