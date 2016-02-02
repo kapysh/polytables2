@@ -1,7 +1,7 @@
 (function($) {
   'use strict';
 
-  var buildRowClass = function buildNewClass(current_grid_cell) {
+  var buildRowClass = function buildRowClass(current_grid_cell) {
     var newClass = 'pt2-section pt2-expandable-by-col-'+current_grid_cell.expandable_by_column+
       ' pt2-expandable-by-ctrl-'+current_grid_cell.expandable_by_ctrl;
     for(var i = 0; i < current_grid_cell.collapsible_by_columns.length; i++) {
