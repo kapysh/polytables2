@@ -1,6 +1,6 @@
 # polytables2
 
-create collapsible table columns like so:
+create collapsible table columns like this:
 
 ```
 $('#table_id').polytables2({
